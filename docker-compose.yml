@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:13-alpine
+    container_name: postgres
+    restart: always
+    environment:
+      POSTGRES_DB: payment-orchestrator
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: payment-orchestrator-app
+    restart: always
+    environment:
+      DATABASE_HOST: db
+      DATABASE_PORT: 5432
+      DATABASE_USER: postgres
+      DATABASE_PASSWORD: postgres
+      DATABASE_NAME: payment-orchestrator
+    ports:
+      - '3000:3000'
+    depends_on:
+      - db
+
+volumes:
+  db_data:
