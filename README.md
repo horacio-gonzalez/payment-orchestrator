@@ -1,73 +1,110 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+# Payment Processing Engine 🚧 IN DEVELOPMENT
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+> **Status:** Week 1 of 4-week development cycle
+> **Completion:** ~15% (Payment module structure complete)
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## 🚀 Overview
 
-## Description
+This project is a **Payment Orchestration Layer** built with **NestJS**. It is not a direct payment processor/gateway, but rather the engine that manages the payment lifecycle, handles asynchronous webhooks from providers (simulated like Stripe/PayPal), manages user account balances with strict consistency, and maintains a complete immutable audit trail.
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## 🏗 Architecture & Key Decisions
 
-## Installation
+The system follows an event-driven and modular architecture, implementing "Production-Ready" patterns:
+
+*   **Hybrid Architecture:** Separation of Domain/Infrastructure layers within each functional module (Payments, Webhooks, Accounts).
+*   **Data Persistence:** A hybrid approach combining **Cached Balances** (for O(1) fast reads) with **Immutable Transaction Logs** (for auditing and historical reconstruction).
+*   **Concurrency Control:** Implementation of **Pessimistic Locking** in PostgreSQL to guarantee balance integrity during simultaneous operations and prevent race conditions.
+*   **Idempotency (Defense in Depth):** A dual-layer strategy using **Redis** (fast path) and **Database Constraints** (source of truth) to ensure every webhook is processed exactly once.
+*   **Async Processing:** Uses **BullMQ** to decouple webhook reception from processing, enabling retry logic (exponential backoff) and system resilience.
+
+## Current Implementation Status
+* ✅ Project structure (hybrid domain/infrastructure)
+
+* ✅ Payment module scaffolding
+
+* ✅ Database configuration (Knex + PostgreSQL)
+
+* ✅ Docker setup (PostgreSQL)
+
+* ⏳ Webhook module (in progress)
+
+* ⏳ Balance management with FOR UPDATE locking
+
+* ⏳ BullMQ async processing
+
+* ⏳ Redis idempotency layer
+
+## Development Roadmap
+See [IMPLEMENTATION_ROADMAP.md](./IMPLEMENTATION_ROADMAP.md)
+
+## 🛠 Tech Stack
+
+*   **Framework:** NestJS (TypeScript Strict Mode)
+*   **Database:** PostgreSQL
+*   **Queues & Caching:** Redis, BullMQ
+*   **Local Infrastructure:** Docker, Docker Compose
+
+## ⚡️ Getting Started
+
+### Prerequisites
+*   Node.js (v20+)
+*   npm
+*   Docker & Docker Compose
+
+### Installation
+
+1.  Install dependencies:
+```bash
+npm install
+```
+2.  Configure environment variables (ensure your `.env` file is set up).
+
+### Run Infrastructure (Docker)
+
+Start PostgreSQL and Redis containers:
 
 ```bash
-$ pnpm install
+docker-compose up -d
 ```
 
-## Running the app
+### Run Migrations
+
+Set up the database schema:
 
 ```bash
-# development
-$ pnpm run start
-
-# watch mode
-$ pnpm run start:dev
-
-# production mode
-$ pnpm run start:prod
+npm run migration:latest
 ```
 
-## Test
+### Run the Application
 
 ```bash
-# unit tests
-$ pnpm run test
+# Development Mode (Watch)
+npm run start:dev
 
-# e2e tests
-$ pnpm run test:e2e
-
-# test coverage
-$ pnpm run test:cov
+# Production Mode
+npm run start:prod
 ```
 
-## Support
+## 🧪 Testing
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+The project implements a pyramidal testing strategy:
 
-## Stay in touch
+```bash
+# Unit Tests
+npm run test
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+# E2E Tests (Full integration tests)
+npm run test:e2e
 
-## License
+# Coverage Report
+npm run test:cov
+```
 
-Nest is [MIT licensed](LICENSE).
+## 👤 Author
+
+**Horacio González**
+*Senior Backend Engineer*
+
+Built to demonstrate technical expertise in NestJS, advanced PostgreSQL patterns, and Fintech architectures.
+
+*   **Email:** horaciojesusgg@gmail.com
