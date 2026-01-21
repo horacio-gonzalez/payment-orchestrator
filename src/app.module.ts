@@ -5,6 +5,7 @@ import { PaymentsModule } from './modules/payments/payments.module';
 import { WebhooksModule } from './modules/webhooks/webhooks.module';
 import { DatabaseModule } from './shared/database/database.module';
 import { ConfigModule } from '@nestjs/config';
+import { AccountsModule } from './modules/accounts/accounts.module';
 import * as Joi from 'joi';
 
 @Module({
@@ -37,6 +38,7 @@ import * as Joi from 'joi';
     DatabaseModule,
     PaymentsModule,
     WebhooksModule,
+    AccountsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

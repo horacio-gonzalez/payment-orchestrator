@@ -1,6 +1,6 @@
 import { Knex } from 'knex';
 import * as dotenv from 'dotenv';
-import * as path from 'path'; // <--- Agregar este import
+import * as path from 'path';
 
 dotenv.config();
 
@@ -18,8 +18,7 @@ export const knexConfig: Knex.Config = {
     max: 10,
   },
   migrations: {
-    // Usar __dirname asegura que la carpeta se cree relativa a ESTE archivo
-    directory: path.join(__dirname, 'migrations'),
+    directory: path.join(__dirname, 'src/shared/database/migrations'),
     tableName: 'knex_migrations',
   },
 };
