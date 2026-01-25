@@ -6,7 +6,7 @@ import { ConfigService } from '@nestjs/config';
 @Module({
   providers: [
     {
-      provide: 'KNEX_CONNECTION',
+      provide: 'KNEX',
       useFactory: async (configService: ConfigService): Promise<Knex> => {
         const config: Knex.Config = {
           client: 'pg',
@@ -29,6 +29,6 @@ import { ConfigService } from '@nestjs/config';
       inject: [ConfigService],
     },
   ],
-  exports: ['KNEX_CONNECTION'],
+  exports: ['KNEX'],
 })
-export class DatabaseModule {}
+export class DatabaseModule { }

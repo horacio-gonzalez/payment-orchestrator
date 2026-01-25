@@ -1,10 +1,14 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common';
 import { CreateAccountDto } from './dto/create-account.dto';
 import { UpdateAccountDto } from './dto/update-account.dto';
+import { IAccountsRepository } from './i-accounts.repository';
 
 @Injectable()
 export class AccountsService {
-  create(createAccountDto: CreateAccountDto) {
+  constructor(private accountsRepository: IAccountsRepository) { }
+
+  async create(createAccountDto: CreateAccountDto) {
+    let a = await this.accountsRepository.findById("");
     return 'This action adds a new account';
   }
 

@@ -15,7 +15,7 @@ import * as Joi from 'joi';
       envFilePath: '.env',
       validationSchema: Joi.object({
         // Server
-        PORT: Joi.number().default(3000),
+        PORT: Joi.number().default(3001),
         NODE_ENV: Joi.string()
           .valid('development', 'production', 'test')
           .default('development'),
@@ -43,4 +43,4 @@ import * as Joi from 'joi';
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule { }
