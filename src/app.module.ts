@@ -4,6 +4,7 @@ import { AppService } from './app.service';
 import { PaymentsModule } from './modules/payments/payments.module';
 import { WebhooksModule } from './modules/webhooks/webhooks.module';
 import { DatabaseModule } from './shared/database/database.module';
+import { RedisModule } from './shared/redis/redis.module';
 import { ConfigModule } from '@nestjs/config';
 import { AccountsModule } from './modules/accounts/accounts.module';
 import * as Joi from 'joi';
@@ -26,9 +27,11 @@ import * as Joi from 'joi';
         DATABASE_PASSWORD: Joi.string().required(),
         DATABASE_NAME: Joi.string().required(),
 
-        // Redis (Para BullMQ)
-        REDIS_HOST: Joi.string().required(),
+        // Redis
+        REDIS_HOST: Joi.string().default('localhost'),
         REDIS_PORT: Joi.number().default(6379),
+        REDIS_PASSWORD: Joi.string().optional().allow(''),
+        REDIS_DB: Joi.number().default(0),
       }),
       // Evita que la app arranque si falta algo crítico
       validationOptions: {
@@ -36,6 +39,7 @@ import * as Joi from 'joi';
       },
     }),
     DatabaseModule,
+    RedisModule,
     PaymentsModule,
     WebhooksModule,
     AccountsModule,
