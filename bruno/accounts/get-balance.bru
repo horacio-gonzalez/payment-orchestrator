@@ -1,0 +1,32 @@
+meta {
+  name: Get Account Balance
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/accounts/:accountId/balance
+  body: none
+  auth: none
+}
+
+params:path {
+  accountId: 550e8400-e29b-41d4-a716-446655440000
+}
+
+docs {
+  # Get Account Balance
+  
+  Obtiene el balance actual de una cuenta.
+  
+  ## Response esperado:
+  ```json
+  {
+    "accountId": "uuid",
+    "balance": 15000.00,
+    "currency": "USD"
+  }
+  ```
+  
+  Balance se actualiza cuando webhooks de payment_succeeded se procesan.
+}

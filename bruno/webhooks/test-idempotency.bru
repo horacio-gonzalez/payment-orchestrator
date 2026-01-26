@@ -1,0 +1,58 @@
+meta {
+  name: Test - Idempotency (Duplicate)
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/webhooks/stripe
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "id": "evt_test_DUPLICATE_123",
+    "object": "event",
+    "api_version": "2023-10-16",
+    "created": 1706234567,
+    "data": {
+      "object": {
+        "id": "pi_test_duplicate",
+        "object": "payment_intent",
+        "amount": 1000,
+        "currency": "usd",
+        "status": "succeeded",
+        "metadata": {
+          "payment_id": "880e8400-e29b-41d4-a716-446655440003"
+        }
+      }
+    },
+    "livemode": false,
+    "pending_webhooks": 1,
+    "request": {
+      "id": "req_test_dup",
+      "idempotency_key": null
+    },
+    "type": "payment_intent.succeeded"
+  }
+}
+
+docs {
+  # Idempotency Test
+  
+  Usa el MISMO `id` ("evt_test_DUPLICATE_123") para probar idempotency.
+  
+  ## Test flow:
+  1. **Primera llamada:** Response `{ status: 'accepted', jobId: '...' }`
+  2. **Segunda llamada (misma ID):** Response `{ status: 'duplicate' }`
+  
+  ## Verificar:
+  - Primera vez: Job enqueued, webhook guardado en DB
+  - Segunda vez: No job enqueued, retorno inmediato desde Redis/DB
+  - Bull Board ({{bullBoardUrl}}): Solo UN job creado (no duplicado)
+  
+  ## Performance:
+  - Primera llamada: ~6-10ms (Redis + DB insert)
+  - Segunda llamada: ~2-3ms (solo Redis lookup)
+}

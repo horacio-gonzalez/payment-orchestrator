@@ -1,0 +1,61 @@
+meta {
+  name: Stripe - Payment Succeeded
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/webhooks/stripe
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "id": "evt_test_payment_succeeded_001",
+    "object": "event",
+    "api_version": "2023-10-16",
+    "created": 1706234567,
+    "data": {
+      "object": {
+        "id": "pi_test_12345",
+        "object": "payment_intent",
+        "amount": 5000,
+        "currency": "usd",
+        "status": "succeeded",
+        "metadata": {
+          "payment_id": "550e8400-e29b-41d4-a716-446655440000",
+          "account_id": "account-123",
+          "user_id": "user-456"
+        }
+      }
+    },
+    "livemode": false,
+    "pending_webhooks": 1,
+    "request": {
+      "id": "req_test_123",
+      "idempotency_key": null
+    },
+    "type": "payment_intent.succeeded"
+  }
+}
+
+docs {
+  # Payment Succeeded Webhook
+  
+  Simula un webhook de Stripe cuando un pago se completa exitosamente.
+  
+  ## Flujo esperado:
+  1. Controller valida idempotency (Redis + DB)
+  2. Encola job en Bull queue
+  3. Retorna `{ status: 'accepted', jobId: '...' }` en <100ms
+  4. Worker procesa async:
+     - Actualiza payment status a 'completed'
+     - Incrementa balance de cuenta
+     - Marca webhook como processed
+  
+  ## Verificar:
+  - Response inmediato con jobId
+  - Bull Board ({{bullBoardUrl}}): Ver job procesándose
+  - DB: payment actualizado, webhook_events.processed_at set
+}

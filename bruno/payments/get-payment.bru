@@ -1,0 +1,36 @@
+meta {
+  name: Get Payment by ID
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/payments/:paymentId
+  body: none
+  auth: none
+}
+
+params:path {
+  paymentId: 550e8400-e29b-41d4-a716-446655440000
+}
+
+docs {
+  # Get Payment
+  
+  Obtiene detalles de un payment específico.
+  
+  ## Response esperado:
+  ```json
+  {
+    "id": "uuid",
+    "accountId": "...",
+    "amount": 5000,
+    "status": "completed",
+    "provider": "stripe",
+    "createdAt": "...",
+    "updatedAt": "..."
+  }
+  ```
+  
+  Reemplaza `:paymentId` en la URL con un ID real.
+}

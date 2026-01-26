@@ -1,0 +1,63 @@
+meta {
+  name: Stripe - Payment Failed
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/webhooks/stripe
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "id": "evt_test_payment_failed_001",
+    "object": "event",
+    "api_version": "2023-10-16",
+    "created": 1706234567,
+    "data": {
+      "object": {
+        "id": "pi_test_67890",
+        "object": "payment_intent",
+        "amount": 3000,
+        "currency": "usd",
+        "status": "failed",
+        "last_payment_error": {
+          "code": "card_declined",
+          "message": "Your card was declined",
+          "type": "card_error"
+        },
+        "metadata": {
+          "payment_id": "660e8400-e29b-41d4-a716-446655440001",
+          "account_id": "account-123",
+          "user_id": "user-456"
+        }
+      }
+    },
+    "livemode": false,
+    "pending_webhooks": 1,
+    "request": {
+      "id": "req_test_456",
+      "idempotency_key": null
+    },
+    "type": "payment_intent.payment_failed"
+  }
+}
+
+docs {
+  # Payment Failed Webhook
+  
+  Simula un webhook cuando un pago falla (tarjeta rechazada, fondos insuficientes, etc).
+  
+  ## Flujo esperado:
+  1. Idempotency check
+  2. Encola job
+  3. Worker actualiza payment status a 'failed'
+  4. NO incrementa balance (pago falló)
+  
+  ## Verificar:
+  - Payment marcado como 'failed'
+  - Balance sin cambios
+  - Error info guardado (opcional)
+}

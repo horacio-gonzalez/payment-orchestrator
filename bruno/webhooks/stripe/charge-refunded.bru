@@ -1,0 +1,58 @@
+meta {
+  name: Stripe - Charge Refunded
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/webhooks/stripe
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "id": "evt_test_charge_refunded_001",
+    "object": "event",
+    "api_version": "2023-10-16",
+    "created": 1706234567,
+    "data": {
+      "object": {
+        "id": "ch_test_98765",
+        "object": "charge",
+        "amount": 5000,
+        "amount_refunded": 5000,
+        "currency": "usd",
+        "refunded": true,
+        "metadata": {
+          "payment_id": "770e8400-e29b-41d4-a716-446655440002",
+          "account_id": "account-123",
+          "user_id": "user-456"
+        }
+      }
+    },
+    "livemode": false,
+    "pending_webhooks": 1,
+    "request": {
+      "id": "req_test_789",
+      "idempotency_key": null
+    },
+    "type": "charge.refunded"
+  }
+}
+
+docs {
+  # Charge Refunded Webhook
+  
+  Simula un webhook cuando se realiza un refund total o parcial.
+  
+  ## Flujo esperado:
+  1. Idempotency check
+  2. Encola job
+  3. Worker:
+     - Decrementa balance de cuenta
+     - Crea transaction record negativo
+     - Actualiza payment status a 'refunded'
+  
+  ## TODO: Implementar lógica de refunds en processor
+}
