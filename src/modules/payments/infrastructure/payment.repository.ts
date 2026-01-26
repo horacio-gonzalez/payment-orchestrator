@@ -6,7 +6,7 @@ import { PaymentStatus } from '../domain/payment.types';
 
 @Injectable()
 export class PaymentRepository {
-  constructor(@Inject('KNEX_CONNECTION') private readonly knex: Knex) {}
+  constructor(@Inject('KNEX') private readonly knex: Knex) { }
 
   async findById(id: string): Promise<Payment | null> {
     const row = await this.knex<PaymentRow>('payments').where({ id }).first();

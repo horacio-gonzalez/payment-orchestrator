@@ -1,11 +1,15 @@
 import { Module } from '@nestjs/common';
+import { BullModule } from '@nestjs/bull';
+import { BullBoardModule } from '@bull-board/nestjs';
+import { ExpressAdapter } from '@bull-board/express';
+import { BullAdapter } from '@bull-board/api/bullAdapter';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { PaymentsModule } from './modules/payments/payments.module';
 import { WebhooksModule } from './modules/webhooks/webhooks.module';
 import { DatabaseModule } from './shared/database/database.module';
 import { RedisModule } from './shared/redis/redis.module';
-import { ConfigModule } from '@nestjs/config';
 import { AccountsModule } from './modules/accounts/accounts.module';
 import * as Joi from 'joi';
 
@@ -37,6 +41,22 @@ import * as Joi from 'joi';
       validationOptions: {
         abortEarly: true,
       },
+    }),
+    BullModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: (configService: ConfigService) => ({
+        redis: {
+          host: configService.get('REDIS_HOST'),
+          port: configService.get('REDIS_PORT'),
+          password: configService.get('REDIS_PASSWORD'),
+          db: configService.get('REDIS_DB'),
+        },
+      }),
+      inject: [ConfigService],
+    }),
+    BullBoardModule.forRoot({
+      route: '/admin/queues',
+      adapter: ExpressAdapter,
     }),
     DatabaseModule,
     RedisModule,

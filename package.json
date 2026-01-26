@@ -25,11 +25,15 @@
     "seed:run": "knex seed:run --knexfile ./knexfile.ts"
   },
   "dependencies": {
+    "@bull-board/express": "^6.16.4",
+    "@bull-board/nestjs": "^6.16.4",
+    "@nestjs/bull": "^11.0.4",
     "@nestjs/common": "^11.1.12",
     "@nestjs/config": "^4.0.2",
     "@nestjs/core": "^11.1.12",
     "@nestjs/mapped-types": "*",
     "@nestjs/platform-express": "^11.1.12",
+    "bull": "^4.16.5",
     "dotenv": "^17.2.3",
     "ioredis": "^5.9.2",
     "joi": "^18.0.2",
