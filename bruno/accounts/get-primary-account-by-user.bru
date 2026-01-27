@@ -1,0 +1,52 @@
+meta {
+  name: Get Primary Account by User
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/accounts/user/:userId/primary
+  body: none
+  auth: none
+}
+
+params:path {
+  userId: 550e8400-e29b-41d4-a716-446655440000
+}
+
+docs {
+  # Get Primary Account by User
+  
+  Obtiene la cuenta primaria de un usuario.
+  
+  Útil cuando solo tienes el userId (por ejemplo, desde webhooks de providers).
+  
+  ## Response esperado:
+  ```json
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440000",
+    "userId": "user-123",
+    "balance": 1000.50,
+    "reservedBalance": 50.00,
+    "availableBalance": 950.50,
+    "currency": "USD",
+    "status": "active",
+    "isPrimary": true,
+    "createdAt": "2026-01-26T...",
+    "updatedAt": "2026-01-26T..."
+  }
+  ```
+  
+  ## Casos de uso:
+  - Webhooks de payment providers (solo envían userId)
+  - Acreditar fondos cuando se confirma un pago
+  - Obtener balance disponible antes de crear payment
+  
+  ## Error si no existe:
+  ```json
+  {
+    "statusCode": 404,
+    "message": "No primary account found for user user-123"
+  }
+  ```
+}

@@ -1,0 +1,42 @@
+meta {
+  name: Get Account by ID
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/accounts/:id
+  body: none
+  auth: none
+}
+
+params:path {
+  id: 550e8400-e29b-41d4-a716-446655440000
+}
+
+docs {
+  # Get Account by ID
+  
+  Obtiene información completa de una cuenta por su ID.
+  
+  ## Response esperado:
+  ```json
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440000",
+    "userId": "user-123",
+    "balance": 1000.50,
+    "reservedBalance": 50.00,
+    "availableBalance": 950.50,
+    "currency": "USD",
+    "status": "active",
+    "isPrimary": true,
+    "createdAt": "2026-01-26T...",
+    "updatedAt": "2026-01-26T..."
+  }
+  ```
+  
+  - `balance`: Fondos totales en la cuenta
+  - `reservedBalance`: Fondos reservados para operaciones pendientes
+  - `availableBalance`: balance - reservedBalance (computed)
+  - `status`: active | frozen | suspended | closed
+}

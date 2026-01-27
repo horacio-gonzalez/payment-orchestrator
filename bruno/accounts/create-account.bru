@@ -1,0 +1,53 @@
+meta {
+  name: Create Account
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/accounts
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "userId": "550e8400-e29b-41d4-a716-446655440000",
+    "currency": "USD"
+  }
+}
+
+docs {
+  # Create Account
+  
+  Crea una nueva cuenta para un usuario.
+  
+  ## Request body:
+  ```json
+  {
+    "userId": "550e8400-e29b-41d4-a716-446655440000",
+    "currency": "USD" // USD | EUR | ARS | GBP
+  }
+  ```
+  
+  **IMPORTANTE:** userId debe ser un UUID v4 válido.
+  
+  ## Response esperado:
+  ```json
+  {
+    "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "userId": "550e8400-e29b-41d4-a716-446655440000",
+    "balance": 0,
+    "reservedBalance": 0,
+    "availableBalance": 0,
+    "currency": "USD",
+    "status": "active",
+    "isPrimary": true,
+    "createdAt": "2026-01-26T..."
+  }
+  ```
+  
+  - La cuenta se crea con balance 0
+  - Por defecto es la cuenta primaria del usuario
+  - Status inicial es 'active'
+}
