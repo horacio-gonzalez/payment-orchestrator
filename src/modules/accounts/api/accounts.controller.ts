@@ -3,40 +3,80 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Param,
-  Delete,
+  HttpCode,
+  HttpStatus,
 } from '@nestjs/common';
 import { AccountsService } from '../domain/accounts.service';
 import { CreateAccountDto } from '../domain/dto/create-account.dto';
-import { UpdateAccountDto } from '../domain/dto/update-account.dto';
 
 @Controller('accounts')
 export class AccountsController {
-  constructor(private readonly accountsService: AccountsService) {}
+  constructor(private readonly accountsService: AccountsService) { }
 
+  /**
+   * POST /accounts
+   * Create a new account for a user
+   */
   @Post()
-  create(@Body() createAccountDto: CreateAccountDto) {
-    return this.accountsService.create(createAccountDto);
+  @HttpCode(HttpStatus.CREATED)
+  async create(@Body() dto: CreateAccountDto) {
+    const account = await this.accountsService.createAccount(dto.userId, dto.currency);
+
+    return {
+      id: account.id,
+      userId: account.userId,
+      balance: account.balance,
+      reservedBalance: account.reservedBalance,
+      availableBalance: account.availableBalance,
+      currency: account.currency,
+      status: account.status,
+      isPrimary: account.isPrimary,
+      createdAt: account.createdAt,
+    };
   }
 
-  @Get()
-  findAll() {
-    return this.accountsService.findAll();
-  }
-
+  /**
+   * GET /accounts/:id
+   * Get account by ID
+   */
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.accountsService.findOne(+id);
+  async findOne(@Param('id') id: string) {
+    const account = await this.accountsService.findById(id);
+
+    return {
+      id: account.id,
+      userId: account.userId,
+      balance: account.balance,
+      reservedBalance: account.reservedBalance,
+      availableBalance: account.availableBalance,
+      currency: account.currency,
+      status: account.status,
+      isPrimary: account.isPrimary,
+      createdAt: account.createdAt,
+      updatedAt: account.updatedAt,
+    };
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateAccountDto: UpdateAccountDto) {
-    return this.accountsService.update(+id, updateAccountDto);
-  }
+  /**
+   * GET /accounts/user/:userId/primary
+   * Get primary account for a user
+   */
+  @Get('user/:userId/primary')
+  async findPrimaryByUser(@Param('userId') userId: string) {
+    const account = await this.accountsService.findPrimaryByUser(userId);
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.accountsService.remove(+id);
+    return {
+      id: account.id,
+      userId: account.userId,
+      balance: account.balance,
+      reservedBalance: account.reservedBalance,
+      availableBalance: account.availableBalance,
+      currency: account.currency,
+      status: account.status,
+      isPrimary: account.isPrimary,
+      createdAt: account.createdAt,
+      updatedAt: account.updatedAt,
+    };
   }
 }

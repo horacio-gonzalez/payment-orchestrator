@@ -2,13 +2,32 @@ import { Injectable, Inject } from '@nestjs/common';
 import { Knex } from 'knex';
 import { Account, AccountStatus, Currency } from '../domain/account.entity';
 import { IAccountsRepository } from '../domain/i-accounts.repository';
+import { randomUUID } from 'crypto';
 
 @Injectable()
 export class AccountsRepository implements IAccountsRepository {
-  constructor(@Inject('KNEX') private knex: Knex) {}
+  constructor(@Inject('KNEX') private knex: Knex) { }
 
-  async findById(accountId: string): Promise<Account | null> {
-    const row = await this.knex('accounts').where({ id: accountId }).first();
+  // ============================================
+  // READ OPERATIONS
+  // ============================================
+
+  async findById(accountId: string, trx?: Knex.Transaction): Promise<Account | null> {
+    const query = (trx || this.knex)('accounts').where({ id: accountId }).first();
+    const row = await query;
+
+    return row ? this.mapToEntity(row) : null;
+  }
+
+  /**
+   * Find account with pessimistic locking (FOR UPDATE)
+   * CRITICAL: Prevents race conditions on balance operations
+   */
+  async findByIdForUpdate(accountId: string, trx: Knex.Transaction): Promise<Account | null> {
+    const row = await trx('accounts')
+      .where({ id: accountId })
+      .forUpdate()  // SELECT ... FOR UPDATE
+      .first();
 
     return row ? this.mapToEntity(row) : null;
   }
@@ -19,6 +38,64 @@ export class AccountsRepository implements IAccountsRepository {
       .first();
 
     return row ? this.mapToEntity(row) : null;
+  }
+
+  // ============================================
+  // WRITE OPERATIONS
+  // ============================================
+
+  async create(userId: string, currency: Currency, trx?: Knex.Transaction): Promise<Account> {
+    const id = randomUUID();
+    const now = new Date();
+
+    const accountData = {
+      id,
+      user_id: userId,
+      balance: 0,
+      reserved_balance: 0,
+      currency,
+      status: AccountStatus.ACTIVE,
+      is_primary: true,
+      metadata: {},
+      created_at: now,
+      updated_at: now,
+    };
+
+    await (trx || this.knex)('accounts').insert(accountData);
+
+    return this.mapToEntity(accountData);
+  }
+
+  // ============================================
+  // BALANCE MUTATIONS (require transaction)
+  // ============================================
+
+  async increaseBalance(accountId: string, amount: number, trx: Knex.Transaction): Promise<void> {
+    await trx('accounts')
+      .where({ id: accountId })
+      .increment('balance', amount)
+      .update({ updated_at: new Date() });
+  }
+
+  async decreaseBalance(accountId: string, amount: number, trx: Knex.Transaction): Promise<void> {
+    await trx('accounts')
+      .where({ id: accountId })
+      .decrement('balance', amount)
+      .update({ updated_at: new Date() });
+  }
+
+  async reserveBalance(accountId: string, amount: number, trx: Knex.Transaction): Promise<void> {
+    await trx('accounts')
+      .where({ id: accountId })
+      .increment('reserved_balance', amount)
+      .update({ updated_at: new Date() });
+  }
+
+  async releaseReserve(accountId: string, amount: number, trx: Knex.Transaction): Promise<void> {
+    await trx('accounts')
+      .where({ id: accountId })
+      .decrement('reserved_balance', amount)
+      .update({ updated_at: new Date() });
   }
 
   private mapToEntity(row: any): Account {

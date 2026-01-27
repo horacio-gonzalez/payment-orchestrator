@@ -1,8 +1,16 @@
-import { Account } from './account.entity';
+import { Account, Currency } from './account.entity';
+import { Knex } from 'knex';
 
-// src/modules/accounts/domain/accounts.repository.interface.ts
 export abstract class IAccountsRepository {
-  abstract findById(accountId: string): Promise<Account | null>;
+  // Read operations
+  abstract findById(accountId: string, trx?: Knex.Transaction): Promise<Account | null>;
+  abstract findByIdForUpdate(accountId: string, trx: Knex.Transaction): Promise<Account | null>;
   abstract findPrimaryByUser(userId: string): Promise<Account | null>;
-  // Agregar otros métodos que necesites
+
+  // Write operations
+  abstract create(userId: string, currency: Currency, trx?: Knex.Transaction): Promise<Account>;
+  abstract increaseBalance(accountId: string, amount: number, trx: Knex.Transaction): Promise<void>;
+  abstract decreaseBalance(accountId: string, amount: number, trx: Knex.Transaction): Promise<void>;
+  abstract reserveBalance(accountId: string, amount: number, trx: Knex.Transaction): Promise<void>;
+  abstract releaseReserve(accountId: string, amount: number, trx: Knex.Transaction): Promise<void>;
 }

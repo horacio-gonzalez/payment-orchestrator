@@ -34,6 +34,8 @@
     "@nestjs/mapped-types": "*",
     "@nestjs/platform-express": "^11.1.12",
     "bull": "^4.16.5",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.3",
     "dotenv": "^17.2.3",
     "ioredis": "^5.9.2",
     "joi": "^18.0.2",
