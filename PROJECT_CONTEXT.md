@@ -364,7 +364,6 @@ This project is successful when:
 ## TIMELINE
 - Start: January 2026
 - Target completion: February 2026 (3-4 weeks)
-- Start applying to Spain: March 2026
 
 ## IMPORTANT NOTES FOR CLAUDE CODE
 
