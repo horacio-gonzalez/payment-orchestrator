@@ -3,7 +3,7 @@
 ## WHO I AM
 - **Name:** Horacio González
 - **Role:** Senior Backend Engineer (6 years experience)
-- **Current:** Working at Kenility, moving to Spain in July 2026
+- **Current:** Working at Kenility as a senior backend developer
 - **Goal:** Build portfolio project to demonstrate expertise for European fintech companies
 
 ## PROJECT PURPOSE
