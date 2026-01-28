@@ -4,7 +4,7 @@
 - **Name:** Horacio González
 - **Role:** Senior Backend Engineer (6 years experience)
 - **Current:** Working at Kenility as a senior backend developer
-- **Goal:** Build portfolio project to demonstrate expertise for European fintech companies
+- **Goal:** Build portfolio project to demonstrate expertise in topics like concurrency, queuing, transactions and scalable software architecture
 
 ## PROJECT PURPOSE
 This is a **portfolio project** to demonstrate:
