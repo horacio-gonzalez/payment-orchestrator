@@ -12,5 +12,6 @@ import { IAccountsRepository } from './domain/i-accounts.repository';
       useClass: AccountsRepository,
     },
   ],
+  exports: [AccountsService, IAccountsRepository],
 })
 export class AccountsModule { }

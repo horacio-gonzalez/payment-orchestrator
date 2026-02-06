@@ -14,6 +14,14 @@ export class PaymentRepository {
     return row ? PaymentMapper.toDomain(row) : null;
   }
 
+  async findByExternalPaymentId(externalPaymentId: string): Promise<Payment | null> {
+    const row = await this.knex<PaymentRow>('payments')
+      .where({ external_payment_id: externalPaymentId })
+      .first();
+
+    return row ? PaymentMapper.toDomain(row) : null;
+  }
+
   async findByAccountId(accountId: string): Promise<Payment[]> {
     const rows = await this.knex<PaymentRow>('payments')
       .where({ account_id: accountId })

@@ -39,9 +39,20 @@ export class StripeWebhooksController {
       return { status: 'duplicate' };
     }
 
+    // Persist webhook event to DB
+    const webhookEvent = await this.webhooksService.createEvent({
+      externalId,
+      provider: WebhookProvider.STRIPE,
+      eventType: webhookPayload.type,
+      payload: webhookPayload as any,
+    });
+
+    // Mark in idempotency cache
+    await this.idempotencyService.markAsProcessed(externalId, webhookEvent.id);
+
     // Enqueue for async processing
     const job = await this.webhookQueue.add('process-payment-webhook', {
-      webhookEventId: externalId,
+      webhookEventId: webhookEvent.id,
       payload: webhookPayload,
     });
 

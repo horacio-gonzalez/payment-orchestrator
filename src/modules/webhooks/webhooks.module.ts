@@ -9,10 +9,14 @@ import { WebhookEventsRepository } from './infrastructure/webhook-events.reposit
 import { WebhookIdempotencyService } from './domain/webhook-idempotency.service';
 import { WebhookProcessor } from './infrastructure/webhook.processor';
 import { PaymentsModule } from '../payments/payments.module';
+import { AccountsModule } from '../accounts/accounts.module';
+import { TransactionsModule } from '../transactions/transactions.module';
 
 @Module({
   imports: [
     PaymentsModule,
+    AccountsModule,
+    TransactionsModule,
     BullModule.registerQueue({
       name: 'webhook-processing',
       defaultJobOptions: {

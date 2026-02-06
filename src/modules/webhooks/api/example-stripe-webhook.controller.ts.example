@@ -1,0 +1,82 @@
+import { Controller, Post, Body, Headers, Logger } from '@nestjs/common';
+import { BaseWebhookController } from './base-webhook.controller';
+import { WebhookIdempotencyService } from '../domain/webhook-idempotency.service';
+import { IWebhookEventsRepository } from '../domain/i-webhook-events.repository';
+import { WebhookProvider } from '../domain/webhook-event.types';
+import { StripeWebhookDto } from '../domain/dto/stripe-webhook.dto';
+import { WebhookReceivedResponseDto } from '../domain/dto/webhook-response.dto';
+import { WebhookEvent } from '../domain/webhook-event.entity';
+
+/**
+ * EXAMPLE: Stripe Webhook Controller
+ * 
+ * Este es un ejemplo de cómo usar el BaseWebhookController.
+ * Renombra este archivo a stripe-webhook.controller.ts cuando lo implementes.
+ */
+@Controller('webhooks')
+export class StripeWebhookController extends BaseWebhookController {
+  protected readonly logger = new Logger(StripeWebhookController.name);
+
+  constructor(
+    idempotencyService: WebhookIdempotencyService,
+    webhookRepo: IWebhookEventsRepository,
+  ) {
+    super(idempotencyService, webhookRepo);
+  }
+
+  @Post('stripe')
+  async handleStripeWebhook(
+    @Body() webhook: StripeWebhookDto,
+    @Headers('stripe-signature') signature: string,
+  ): Promise<WebhookReceivedResponseDto> {
+    // Usar el método base handleWebhook con callback específico de Stripe
+    return this.handleWebhook(
+      webhook.id,                    // external_id
+      WebhookProvider.STRIPE,         // provider
+      webhook.type,                   // event_type
+      webhook as any,                 // payload
+      async () => {
+        // 1. Validar signature de Stripe
+        this.validateStripeSignature(webhook, signature);
+
+        // 2. Crear webhook event en DB
+        const webhookEvent = await this.webhookRepo.create(
+          new WebhookEvent(
+            this.buildWebhookEvent(
+              webhook.id,
+              WebhookProvider.STRIPE,
+              webhook.type,
+              webhook as any,
+            ),
+          ),
+        );
+
+        // 3. Enqueue para procesamiento async (BullMQ)
+        // await this.webhookQueue.add('process-webhook', {
+        //   webhookId: webhookEvent.id,
+        // });
+
+        return { webhookId: webhookEvent.id };
+      },
+    );
+  }
+
+  private validateStripeSignature(
+    webhook: StripeWebhookDto,
+    signature: string,
+  ): void {
+    // TODO: Implementar validación de signature con Stripe SDK
+    // const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+    // const event = stripe.webhooks.constructEvent(
+    //   rawBody,
+    //   signature,
+    //   process.env.STRIPE_WEBHOOK_SECRET
+    // );
+    
+    if (!signature) {
+      throw new Error('Missing Stripe signature');
+    }
+
+    this.logger.debug('Stripe signature validated successfully');
+  }
+}
