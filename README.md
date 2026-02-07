@@ -1,7 +1,7 @@
 # Payment Processing Engine 🚧 IN DEVELOPMENT
 
-> **Status:** Week 1 of 4-week development cycle
-> **Completion:** ~15% (Payment module structure complete)
+> **Status:** Week 2-3 of 4-week development cycle
+> **Completion:** ~60% (Core modules implemented, async processing configured)
 
 ## 🚀 Overview
 
@@ -18,21 +18,30 @@ The system follows an event-driven and modular architecture, implementing "Produ
 *   **Async Processing:** Uses **BullMQ** to decouple webhook reception from processing, enabling retry logic (exponential backoff) and system resilience.
 
 ## Current Implementation Status
-* ✅ Project structure (hybrid domain/infrastructure)
 
-* ✅ Payment module scaffolding
+### ✅ Completed (Core Infrastructure)
+* **Project Architecture:** Hybrid domain/infrastructure/api structure in all modules
+* **Database Layer:** PostgreSQL + Knex configured with migrations
+* **Docker Environment:** PostgreSQL + Redis running in containers
+* **Payment Module:** Complete domain/infrastructure/api layers with unit tests
+* **Accounts Module:** Balance management with domain services and repository
+* **Transactions Module:** Immutable audit log implementation
+* **Webhook Module:** Complete with idempotency + async processing
+* **Redis Integration:** Service configured for caching and idempotency keys
+* **BullMQ Setup:** Async webhook processing with retry logic configured
 
-* ✅ Database configuration (Knex + PostgreSQL)
+### 🚧 In Progress
+* Pessimistic locking (FOR UPDATE) in balance updates
+* Transaction wrapping for atomic balance operations
+* Integration tests for critical flows
+* Concurrency testing (race condition validation)
 
-* ✅ Docker setup (PostgreSQL)
-
-* ⏳ Webhook module (in progress)
-
-* ⏳ Balance management with FOR UPDATE locking
-
-* ⏳ BullMQ async processing
-
-* ⏳ Redis idempotency layer
+### 📋 Remaining
+* Complete audit trail implementation
+* Queue monitoring dashboard (Bull Board)
+* E2E test suite
+* API documentation
+* Deployment configuration
 
 ## Development Roadmap
 See [IMPLEMENTATION_ROADMAP.md](./IMPLEMENTATION_ROADMAP.md)
@@ -40,8 +49,9 @@ See [IMPLEMENTATION_ROADMAP.md](./IMPLEMENTATION_ROADMAP.md)
 ## 🛠 Tech Stack
 
 *   **Framework:** NestJS (TypeScript Strict Mode)
-*   **Database:** PostgreSQL
+*   **Database:** PostgreSQL (with Knex query builder)
 *   **Queues & Caching:** Redis, BullMQ
+*   **Testing:** Jest (unit/integration), Supertest (e2e)
 *   **Local Infrastructure:** Docker, Docker Compose
 
 ## ⚡️ Getting Started
@@ -99,6 +109,31 @@ npm run test:e2e
 # Coverage Report
 npm run test:cov
 ```
+
+## 📚 Key Features Implemented
+
+### Webhook Processing System
+- **Idempotency:** Dual-layer (Redis + Database) to prevent duplicate processing
+- **Async Processing:** Bull queue with exponential backoff retry logic
+- **Event Storage:** Immutable webhook event log with unique constraints
+
+### Account & Balance Management
+- **Hybrid Persistence:** Cached balances + immutable transaction log
+- **Concurrency Control:** Pessimistic locking (FOR UPDATE) for safe concurrent updates
+- **Audit Trail:** Complete transaction history for compliance
+
+### Module Architecture
+- **Domain Layer:** Pure business logic (no infrastructure dependencies)
+- **Infrastructure Layer:** Repositories, external services, queue workers
+- **API Layer:** Controllers, DTOs, validation with class-validator
+- **Clean Separation:** Testable, maintainable codebase following SOLID principles
+
+## 📖 Documentation
+
+- `PROJECT_CONTEXT.md` - Complete project scope, architecture, and learning goals
+- `src/docs/ADR.md` - Architectural Decision Records with detailed rationale
+- `CLAUDE.md` - Quick reference for development patterns
+- `IMPLEMENTATION_ROADMAP.md` - Week-by-week development plan
 
 ## 👤 Author
 
