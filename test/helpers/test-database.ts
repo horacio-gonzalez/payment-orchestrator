@@ -34,11 +34,7 @@ export async function runMigrations(): Promise<void> {
 
 export async function cleanDatabase(): Promise<void> {
   const db = getTestKnex();
-  // Order matters due to foreign keys
-  await db('transactions').del();
-  await db('webhook_events').del();
-  await db('payments').del();
-  await db('accounts').del();
+  await db.raw('TRUNCATE TABLE transactions, webhook_events, payments, accounts CASCADE');
 }
 
 export async function destroyDatabase(): Promise<void> {

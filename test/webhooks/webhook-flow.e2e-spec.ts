@@ -61,7 +61,7 @@ describe('Webhook Processing Flow (e2e)', () => {
       external_id: webhookExternalId,
       provider: 'stripe',
       event_type: 'payment_intent.succeeded',
-      payload: {
+      payload: JSON.stringify({
         id: webhookExternalId,
         type: 'payment_intent.succeeded',
         data: {
@@ -73,10 +73,9 @@ describe('Webhook Processing Flow (e2e)', () => {
             metadata: { payment_id: paymentId },
           },
         },
-      },
+      }),
       status: 'pending',
       retry_count: 0,
-      metadata: {},
     });
 
     // 2. Simulate processor: all in one transaction

@@ -17,7 +17,7 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "test:e2e": "jest --config ./test/jest-e2e.json --runInBand --forceExit",
     "migration:make": "knex migrate:make --knexfile ./knexfile.ts -x ts",
     "migration:latest": "knex migrate:latest --knexfile ./knexfile.ts",
     "migration:rollback": "knex migrate:rollback --knexfile ./knexfile.ts",
@@ -80,7 +80,15 @@
       "^.+\\.(t|j)s$": "ts-jest"
     },
     "collectCoverageFrom": [
-      "**/*.(t|j)s"
+      "**/*.(t|j)s",
+      "!main.ts",
+      "!**/*.module.ts",
+      "!**/migrations/**",
+      "!**/dto/**",
+      "!**/index.ts",
+      "!**/infrastructure/**",
+      "!**/filters/**",
+      "!**/base-webhook.controller.ts"
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"

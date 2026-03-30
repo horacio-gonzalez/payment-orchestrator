@@ -1,10 +1,12 @@
-import { Injectable, Inject, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Injectable, Inject, Logger, NotFoundException, BadRequestException } from '@nestjs/common';
 import { Knex } from 'knex';
 import { IAccountsRepository } from './i-accounts.repository';
 import { Account, Currency, AccountStatus } from './account.entity';
 
 @Injectable()
 export class AccountsService {
+  private readonly logger = new Logger(AccountsService.name);
+
   constructor(
     private accountsRepository: IAccountsRepository,
     @Inject('KNEX') private knex: Knex,
@@ -189,6 +191,38 @@ export class AccountsService {
     } else {
       await this.knex.transaction(execute);
     }
+  }
+
+  // ============================================
+  // RECONCILIATION
+  // ============================================
+
+  async reconcileBalance(accountId: string): Promise<{
+    cached: number;
+    calculated: number;
+    discrepancy: number;
+  }> {
+    const account = await this.accountsRepository.findById(accountId);
+    if (!account) {
+      throw new NotFoundException(`Account ${accountId} not found`);
+    }
+
+    const result = await this.knex('transactions')
+      .where({ account_id: accountId })
+      .sum('amount as total')
+      .first();
+
+    const calculated = parseFloat(result?.total ?? '0');
+    const cached = account.balance;
+    const discrepancy = Math.abs(cached - calculated);
+
+    if (discrepancy > 0.01) {
+      this.logger.warn(
+        `Balance discrepancy detected for account ${accountId}: cached=${cached}, calculated=${calculated}, discrepancy=${discrepancy}`,
+      );
+    }
+
+    return { cached, calculated, discrepancy };
   }
 
   // ============================================
